@@ -9,10 +9,15 @@ class Server {
         this.app  = express();
         this.port = process.env.PORT;
         this.server = require('http').createServer(this.app);
-        this.io  = require('socket.io')(this.server);
         this.paths = {}
         // Middlewares implmentado para trabajar server y client en el mismo proyecto
         this.middlewares();
+        this.io = require('socket.io')(this.server, {
+            cors: {
+              origin: process.env.CLIENT_URL,
+              methods: ['GET', 'POST']
+            }
+          });
         // Rutas de mi aplicación
         this.routes();
         //Sockets
