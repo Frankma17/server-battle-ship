@@ -65,7 +65,6 @@ let shipBoard = [
 ];
 const shipsCustomers = [];
 
-
 function locateBoat(board, size) {
   let result = false;
   let rigth = false;
@@ -83,8 +82,10 @@ function locateBoat(board, size) {
       let randomRigth = randomColum + size;
       let randomLeft = randomColum - size;
       if (randomUbication == 0) {
-        console.log('Entra por primero horizontal')
+        console.log("Entra por primero horizontal");
         if (randomRigth >= 0 && randomRigth <= 29) {
+          console.log("Entra por derecha");
+
           if (shipBoard[randomRow][randomColum + size] == 0) {
             rigth = true;
             for (i = randomColum; i < randomColum + size; i++) {
@@ -101,6 +102,8 @@ function locateBoat(board, size) {
             }
           }
         } else if (randomLeft >= 0 && randomLeft <= 29) {
+          console.log("Entra por izquierda");
+
           if (shipBoard[randomRow][randomColum - size] == 0) {
             left = true;
             for (i = randomColum; i < randomColum - size; i--) {
@@ -117,14 +120,15 @@ function locateBoat(board, size) {
             }
           }
         } else if (randomDown >= 0 && randomDown <= 14) {
+          console.log("Entra por abajo");
           if (shipBoard[randomRow + size][randomColum] == 0) {
-            up = true;
+            down = true;
             for (i = randomRow; i < randomRow + size; i++) {
               if (shipBoard[i][randomColum] != 0) {
-                up = false;
+                down = false;
               }
             }
-            if (up == true) {
+            if (down == true) {
               for (i = randomRow; i < randomRow + size; i++) {
                 shipBoard[i][randomColum] = "V";
                 board[i][randomColum] = "V";
@@ -133,16 +137,16 @@ function locateBoat(board, size) {
             }
           }
         } else if (randomUp >= 0 && randomUp <= 14) {
-          console.log("Entra en arriba");
+          console.log("Entra por arriba");
 
-          if (shipBoard[randomRow - size][randomColum] != undefined) {
-            down = true;
+          if (shipBoard[randomRow - size][randomColum] == 0) {
+            up = true;
             for (i = randomRow; i < randomRow - size; i--) {
               if (shipBoard[i][randomColum] != 0) {
-                down = false;
+                up = false;
               }
             }
-            if (down == true) {
+            if (up == true) {
               for (i = randomRow; i < randomRow - size; i--) {
                 shipBoard[i][randomColum] = "V";
                 board[i][randomColum] = "V";
@@ -152,16 +156,18 @@ function locateBoat(board, size) {
           }
         }
       } else if (randomUbication == 1) {
-        console.log('Entra por primero vertical')
+        console.log("Entra por primero vertical");
         if (randomDown >= 0 && randomDown <= 14) {
+          console.log("Entra por abajo");
+
           if (shipBoard[randomRow + size][randomColum] == 0) {
-            up = true;
+            down = true;
             for (i = randomRow; i < randomRow + size; i++) {
               if (shipBoard[i][randomColum] != 0) {
-                up = false;
+                down = false;
               }
             }
-            if (up == true) {
+            if (down == true) {
               for (i = randomRow; i < randomRow + size; i++) {
                 shipBoard[i][randomColum] = "V";
                 board[i][randomColum] = "V";
@@ -170,14 +176,16 @@ function locateBoat(board, size) {
             }
           }
         } else if (randomUp >= 0 && randomUp <= 14) {
-          if (shipBoard[randomRow - size][randomColum] != undefined) {
-            down = true;
+          console.log("Entra por arriba");
+
+          if (shipBoard[randomRow - size][randomColum] == 0) {
+            up = true;
             for (i = randomRow; i < randomRow - size; i--) {
               if (shipBoard[i][randomColum] != 0) {
-                down = false;
+                up = false;
               }
             }
-            if (down == true) {
+            if (down == up) {
               for (i = randomRow; i < randomRow - size; i--) {
                 shipBoard[i][randomColum] = "V";
                 board[i][randomColum] = "V";
@@ -186,7 +194,7 @@ function locateBoat(board, size) {
             }
           }
         } else if (randomRigth >= 0 && randomRigth <= 29) {
-          console.log("Entra en derecha");
+          console.log("Entra por derecha");
 
           if (shipBoard[randomRow][randomColum + size] == 0) {
             rigth = true;
@@ -204,7 +212,7 @@ function locateBoat(board, size) {
             }
           }
         } else if (randomLeft >= 0 && randomLeft <= 29) {
-          console.log("Entra en izquierda");
+          console.log("Entra por izquierda");
 
           if (shipBoard[randomRow][randomColum - size] == 0) {
             left = true;
@@ -291,173 +299,238 @@ const socketController = (socket, io) => {
   socket.on("send-atack", (payload) => {
     console.log("Recibir el mensaje de ataque del cliente");
     console.log(payload);
-    let result = attack(payload.x, payload.y,io);
+    let result = attack(payload.x, payload.y, io);
     //Emitir mensaje a todos menos al cliente que lo lanza
-    socket.emit('result-attack' , result);
+    socket.emit("result-attack", result);
     io.emit("send-ship-board", shipBoard);
-    printBoard(shipBoard)
-});
+    printBoard(shipBoard);
+  });
 
   socket.on("start-game", (payload) => {
-    if (totalCustomers <= 15) {
-      customers.forEach((customer) => {
-        const specificCustomer = io.sockets.sockets.get(customer.id);
+    if (payload == true) {
+      if (totalCustomers <= 15) {
         let emptyBoard = [
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+          [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+          ],
+        ];
+        shipBoard = emptyBoard;
+        customers.forEach((customer) => {
+          const specificCustomer = io.sockets.sockets.get(customer.id);
+          let emptyBoard = [
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
           ];
-        let board = locateBoat(emptyBoard, 2);
-        //board = locateBoat(board, 3);
-        //board = locateBoat(board, 2);
-        //board = locateBoat(board, 2);
-        console.log(`Tablero del usuario ${customer.name}`);
-        printBoard(board);
-        const shipCustomer = {
+          let board = locateBoat(emptyBoard, 2);
+          //board = locateBoat(board, 3);
+          //board = locateBoat(board, 2);
+          //board = locateBoat(board, 2);
+          console.log(`Tablero del usuario ${customer.name}`);
+          printBoard(board);
+          const shipCustomer = {
             id: customer.id,
             name: customer.name,
-            board: board
-        }
-        shipsCustomers.push(shipCustomer);
-        specificCustomer.emit("send-my-board", board);
-        io.emit("send-ship-board", shipBoard);
-      });
-    }
-    if (totalCustomers > 15 && totalCustomers <= 30) {
-      customers.forEach((customer) => {
-        const specificCustomer = io.sockets.sockets.get(customer.id);
-        let emptyBoard = [
+            board: board,
+          };
+          shipsCustomers.push(shipCustomer);
+          specificCustomer.emit("send-my-board", board);
+          io.emit("send-ship-board", shipBoard);
+        });
+      }
+      if (totalCustomers > 15 && totalCustomers <= 30) {
+        customers.forEach((customer) => {
+          const specificCustomer = io.sockets.sockets.get(customer.id);
+          let emptyBoard = [
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
             [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
             ],
           ];
-        let board = locateBoat(emptyBoard, 3);
-        board = locateBoat(board, 2);
-        console.log("Tablero del usuario");
-        printBoard(board);
-        const shipCustomer = {
+          let board = locateBoat(emptyBoard, 3);
+          board = locateBoat(board, 2);
+          console.log("Tablero del usuario");
+          printBoard(board);
+          const shipCustomer = {
             id: customer.id,
             name: customer.name,
-            board: board
-        }
-        shipsCustomers.push(shipCustomer);
-        specificCustomer.emit("send-my-board", board);
-        io.emit("send-ship-board", shipBoard);
-      });
+            board: board,
+          };
+          shipsCustomers.push(shipCustomer);
+          specificCustomer.emit("send-my-board", board);
+          io.emit("send-ship-board", shipBoard);
+        });
+      }
     }
   });
 };
@@ -469,97 +542,96 @@ function deleteById(id) {
   }
 }
 
-function attack(x,y,io){
-    let result = false;
-    if(shipBoard[x][y]!='0'){
-        result = true;
-        shipBoard[x][y] = '0'
-        shipsCustomers.forEach(element => {
-            element.board[x][y] = '0'
-        });
-        customers.forEach(element => {
-            validateLoser(element.id);
-        });
-        if(customers.length == 1){
-            io.emit("send-winner", customers[0]);
-        }
+function attack(x, y, io) {
+  let result = false;
+  if (shipBoard[x][y] != "0") {
+    result = true;
+    shipBoard[x][y] = "0";
+    shipsCustomers.forEach((element) => {
+      element.board[x][y] = "0";
+    });
+    customers.forEach((element) => {
+      validateLoser(element.id);
+    });
+    if (customers.length == 1) {
+      io.emit("send-winner", customers[0]);
     }
-    return result
-
+  }
+  return result;
 }
 
-function validateLoser(id){
-    const index = shipsCustomers.findIndex((customer) => customer.id === id);
-    if (index !== -1) {
-        let emptyBoard = [
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-            [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0,
-            ],
-          ];
-        if(customers[index].board == emptyBoard){
-            const specificCustomer = io.sockets.sockets.get(id);
-            specificCustomer.emit("send-loser", true);
-            deleteById(id);
-        }
-      customers.splice(index, 1);
+function validateLoser(id) {
+  const index = shipsCustomers.findIndex((customer) => customer.id === id);
+  if (index !== -1) {
+    let emptyBoard = [
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ],
+    ];
+    if (customers[index].board == emptyBoard) {
+      const specificCustomer = io.sockets.sockets.get(id);
+      specificCustomer.emit("send-loser", true);
+      deleteById(id);
     }
+    customers.splice(index, 1);
+  }
 }
 
 module.exports = {
