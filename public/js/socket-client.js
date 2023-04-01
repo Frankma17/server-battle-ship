@@ -69,3 +69,8 @@ btnEnviar.addEventListener("click", () => {
     console.log(id);
   });
 });
+
+
+btnStart.addEventListener("click", () => {
+    socket.emit("start-game", true);
+  });
