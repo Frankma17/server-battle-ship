@@ -449,7 +449,7 @@ const socketController = (socket, io) => {
           };
           shipsCustomers.push(shipCustomer);
           specificCustomer.emit("send-my-board", board);
-          io.emit("send-ship-board", shipBoard);
+          io.emit("send-ship-board", shipBoard);      
         });
       }
       if (totalCustomers > 15 && totalCustomers <= 30) {
