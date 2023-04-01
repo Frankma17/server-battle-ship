@@ -64,7 +64,7 @@ socket.on("send-my-board", (payload) => {
 
   socket.on("send-loser", (payload) => {
     if (payload != null) {
-        if(payload==true){
+        if(payload.loser==true){
             console.log("Gracias por jugar , te han hundido todos los barcos")
         }
     }

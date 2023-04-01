@@ -539,6 +539,7 @@ function deleteById(id) {
   const index = customers.findIndex((customer) => customer.id === id);
   if (index !== -1) {
     customers.splice(index, 1);
+    shipsCustomers.splice(index,1);
   }
 }
 
@@ -551,7 +552,7 @@ function attack(x, y, io) {
       element.board[x][y] = "0";
     });
     customers.forEach((element) => {
-      validateLoser(element.id);
+      validateLoser(element.id,io);
     });
     if (customers.length == 1) {
       io.emit("send-winner", customers[0]);
@@ -560,79 +561,52 @@ function attack(x, y, io) {
   return result;
 }
 
-function validateLoser(id) {
+function validateLoser(id,io) {
+  console.log("Entra a validar perdedor")
+
   const index = shipsCustomers.findIndex((customer) => customer.id === id);
   if (index !== -1) {
-    let emptyBoard = [
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-      [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-      ],
-    ];
-    if (customers[index].board == emptyBoard) {
+    const array1 = Array(15).fill(Array(30).fill(0)); // Crear una matriz de 15x30 llena de ceros
+    console.log(`El tablero del usario ${shipsCustomers[index].name} en comparación loser es --- `)
+    printBoard(shipsCustomers[index].board);
+    console.log(`El tablero vacio en comparación loser es --- `)
+    printBoard(array1);
+    console.log(`El resultado de la comparación es ${sonMatricesIguales(shipsCustomers[index].board,array1)}`)
+    if (sonMatricesIguales(shipsCustomers[index].board,array1)) {
+      console.log("Entra a loser")
       const specificCustomer = io.sockets.sockets.get(id);
-      specificCustomer.emit("send-loser", true);
+      const payload = {
+        loser : true
+      }
+      specificCustomer.emit("send-loser", payload);
       deleteById(id);
     }
-    customers.splice(index, 1);
   }
 }
+
+function sonMatricesIguales(matriz1, matriz2) {
+  if (matriz1.length !== matriz2.length) {
+    console.log('No son iguales en longitud')
+    return false;
+  }
+  for (let i = 0; i < matriz1.length; i++) {
+    if (matriz1[i].length != matriz2[i].length) {
+      console.log('No son iguales en contenido 1  ')
+
+      return false;
+    }
+    for (let j = 0; j < matriz1[i].length; j++) {
+      if (matriz1[i][j] != matriz2[i][j]) {
+        console.log('No son iguales en contenido 2 ')
+
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+
 
 module.exports = {
   socketController,
