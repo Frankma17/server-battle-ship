@@ -44,6 +44,10 @@ const socketController=(socket,io) =>{
         socket.broadcast.emit('enviar-mensaje',payload);
     });
 
+    socket.on('start-game',(payload)=>{
+        console.log('Recibir el mensaje de inicio')
+        console.log(payload);
+    });
 }
 
 function deleteById(id) {
