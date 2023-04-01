@@ -11,7 +11,7 @@ class Server {
         this.server = require('http').createServer(this.app);
         this.io  = require('socket.io')(this.server);
         this.paths = {}
-        // Middlewares
+        // Middlewares implmentado para trabajar server y client en el mismo proyecto
         this.middlewares();
         // Rutas de mi aplicación
         this.routes();
