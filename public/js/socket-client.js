@@ -2,9 +2,13 @@ const lblOnline = document.querySelector("#lblOnline");
 const lblOffline = document.querySelector("#lblOffline");
 const txtMensaje = document.querySelector("#txtMensaje");
 const btnEnviar = document.querySelector("#btnEnviar");
+const btnStart = document.querySelector("#btnStart");
+
 const customerList = document.querySelector("#customer-list");
 
 const socket = io();
+
+btnStart.style.display = "none";
 
 //Escuchar algun evento
 socket.on("connect", () => {
@@ -23,8 +27,13 @@ socket.on("enviar-mensaje", (payload) => {
 });
 
 socket.on("send-host", (payload) => {
-    if(payload!=null){  console.log(`El host es ${payload.name}`);}
+  if (payload != null) {
+    if (payload.id == socket.id) {
+      btnStart.style.display = "";
+    }
 
+    console.log(`El host es ${payload.name}`);
+  }
 });
 
 socket.on("send-customers", (payload) => {
