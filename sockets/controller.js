@@ -290,14 +290,16 @@ const socketController = (socket, io) => {
   });
 
   socket.on("send-atack", (payload) => {
-    let result = attack(payload.attack.x, payload.attack.y, io);
+    if (payload.attack.x !== 'N') {
+        let result = attack(payload.attack.y, payload.attack.x, io);
     //Emitir mensaje a todos menos al cliente que lo lanza
-    dataAtack={
-      user: payload.user,
-      attack: payload.attack,
-      result : result
+        dataAtack={
+            user: payload.user,
+            attack: payload.attack,
+            result : result
+        }
+        io.emit("result-attack", dataAtack);
     }
-    io.emit("result-attack", dataAtack);
     customersTurn.shift();
     if(customersTurn.length == 0 ){
       customersTurn = [...customers];
@@ -532,6 +534,8 @@ const socketController = (socket, io) => {
         });
       }
     }
+    customersTurn = [...customers];
+    console.log(customersTurn);
     customerTurn = customersTurn[0];
     io.emit("turn-atack", customerTurn);
   });
