@@ -291,7 +291,7 @@ const socketController = (socket, io) => {
 
   socket.on("send-atack", (payload) => {
     if (payload.attack.x !== 'N') {
-        let result = attack(Integer.parseInt(payload.attack.x), Integer.parseInt(payload.attack.y), io);
+        let result = attack(payload.attack.y, payload.attack.x, io);
     //Emitir mensaje a todos menos al cliente que lo lanza
         dataAtack={
             user: payload.user,
