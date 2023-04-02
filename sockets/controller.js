@@ -1,6 +1,8 @@
 let totalCustomers = 0;
 const customers = [];
-let hostCustomer = customers[0];
+let hostCustomer ;
+let customerTurn;
+let customersTurn = [...customers];
 let shipBoard = [
   [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -287,22 +289,21 @@ const socketController = (socket, io) => {
     io.emit("send-host", hostCustomer);
   });
 
-  socket.on("enviar-mensaje", (payload, callback) => {
-    console.log("Recibir el mensaje del client");
-    console.log(payload);
-    const id = 1214;
-    callback(id);
-    //Emitir mensaje a todos menos al cliente que lo lanza
-    socket.broadcast.emit("enviar-mensaje", payload);
-  });
-
   socket.on("send-atack", (payload) => {
-    console.log("Recibir el mensaje de ataque del cliente");
-    console.log(payload);
-    let result = attack(payload.x, payload.y, io);
+    let result = attack(payload.attack.x, payload.attack.y, io);
     //Emitir mensaje a todos menos al cliente que lo lanza
-    socket.emit("result-attack", result);
-    io.emit("send-ship-board", shipBoard);
+    dataAtack={
+      user: payload.user,
+      attack: payload.attack,
+      result : result
+    }
+    io.emit("result-attack", dataAtack);
+    customersTurn.shift();
+    if(customersTurn.length == 0 ){
+      customersTurn = [...customers];
+    }
+    hostCustomer = customersTurn[0];
+    io.emit("turn-atack", hostCustomer);
     printBoard(shipBoard);
   });
 
@@ -449,7 +450,6 @@ const socketController = (socket, io) => {
           };
           shipsCustomers.push(shipCustomer);
           specificCustomer.emit("send-my-board", board);
-          io.emit("send-ship-board", shipBoard);      
         });
       }
       if (totalCustomers > 15 && totalCustomers <= 30) {
@@ -532,6 +532,8 @@ const socketController = (socket, io) => {
         });
       }
     }
+    customerTurn = customersTurn[0];
+    io.emit("turn-atack", customerTurn);
   });
 };
 
@@ -540,6 +542,11 @@ function deleteById(id) {
   if (index !== -1) {
     customers.splice(index, 1);
     shipsCustomers.splice(index,1);
+  }
+
+  const indexTurn = customersTurn.findIndex((customer) => customer.id === id);
+  if (indexTurn !== -1) {
+    customersTurn.splice(index,1);
   }
 }
 
@@ -554,25 +561,24 @@ function attack(x, y, io) {
     customers.forEach((element) => {
       validateLoser(element.id,io);
     });
-    if (customers.length == 1) {
+    customersTurn.shift();
+    if (customers.length == 0) {
+      customersTurn = [...customers];
+    }
+    customerTurn = customersTurn[0];
+    io.emit("turn-atack", customerTurn);
+    if(customers.length == 1){
       io.emit("send-winner", customers[0]);
     }
+
   }
   return result;
 }
 
 function validateLoser(id,io) {
-  console.log("Entra a validar perdedor")
-
   const index = shipsCustomers.findIndex((customer) => customer.id === id);
   if (index !== -1) {
-    const array1 = Array(15).fill(Array(30).fill(0)); // Crear una matriz de 15x30 llena de ceros
-    console.log(`El tablero del usario ${shipsCustomers[index].name} en comparación loser es --- `)
-    printBoard(shipsCustomers[index].board);
-    console.log(`El tablero vacio en comparación loser es --- `)
-    printBoard(array1);
-    console.log(`El resultado de la comparación es ${sonMatricesIguales(shipsCustomers[index].board,array1)}`)
-    if (sonMatricesIguales(shipsCustomers[index].board,array1)) {
+    if (isZeros(shipsCustomers[index].board)) {
       console.log("Entra a loser")
       const specificCustomer = io.sockets.sockets.get(id);
       const payload = {
@@ -584,26 +590,14 @@ function validateLoser(id,io) {
   }
 }
 
-function sonMatricesIguales(matriz1, matriz2) {
-  if (matriz1.length !== matriz2.length) {
-    console.log('No son iguales en longitud')
-    return false;
-  }
-  for (let i = 0; i < matriz1.length; i++) {
-    if (matriz1[i].length != matriz2[i].length) {
-      console.log('No son iguales en contenido 1  ')
-
-      return false;
+function isZeros(arrayOfArrays) {
+  let allZeros = true;
+  arrayOfArrays.forEach(function(array) {
+    if (!array.every(element => element === 0)) {
+      allZeros = false;
     }
-    for (let j = 0; j < matriz1[i].length; j++) {
-      if (matriz1[i][j] != matriz2[i][j]) {
-        console.log('No son iguales en contenido 2 ')
-
-        return false;
-      }
-    }
-  }
-  return true;
+  });
+  return allZeros;
 }
 
 
