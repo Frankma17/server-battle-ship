@@ -290,7 +290,7 @@ const socketController = (socket, io) => {
   });
 
   socket.on("send-atack", (payload) => {
-    let result = attack(payload.attack.x, payload.attack.y, io);
+    let result = attack(Integer.parseInt(payload.attack.x), Integer.parseInt(payload.attack.y), io);
     //Emitir mensaje a todos menos al cliente que lo lanza
     dataAtack={
       user: payload.user,
