@@ -438,9 +438,9 @@ const socketController = (socket, io) => {
             ],
           ];
           let board = locateBoat(emptyBoard, 2);
-          //board = locateBoat(board, 3);
-          //board = locateBoat(board, 2);
-          //board = locateBoat(board, 2);
+          board = locateBoat(board, 3);
+          board = locateBoat(board, 2);
+          board = locateBoat(board, 2);
           console.log(`Tablero del usuario ${customer.name}`);
           printBoard(board);
           const shipCustomer = {
