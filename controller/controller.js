@@ -2,21 +2,21 @@
  * This class implements all methods of listen and emit cliente messages
  */
 //Connected customers counter
-const totalCustomers = 0;
+let totalCustomers = 0;
 //Connected customers list
-const customers = [];
+let customers = [];
 //Host of the game
 let hostCustomer;
 //Customer turn for attack
 let customerTurn;
 //Allow more connections or not
-const acceptConnections = true;
+let acceptConnections = true;
 //Order to play list
-const customersTurn = [...customers];
+let customersTurn = [...customers];
 //Create a blank board
-const shipBoard = [];
+let shipBoard = [];
 //Ships customers list
-const shipsCustomers = [];
+let shipsCustomers = [];
 /**
  * Function for alocated the ships inthin the general board and the customer board                                               nbbn bvvvvvv
  * @param {Board to alocate ships} board
@@ -400,8 +400,8 @@ const socketController = (socket, io) => {
           //Create a empty board
           const emptyBoard = [];
           for (let i = 0; i < 15; i++) {
-            let row = new Array(30).fill(0);
-            shipBoard.push(row);
+            let row = new Array(30).fill("0");
+            emptyBoard.push(row);
           }
           //Initializer the general board in zeros
           shipBoard = emptyBoard;
@@ -412,8 +412,8 @@ const socketController = (socket, io) => {
             //Inializer the specific board in zeros
             const emptyBoard = [];
             for (let i = 0; i < 15; i++) {
-              let row = new Array(30).fill(0);
-              shipBoard.push(row);
+              let row = new Array(30).fill("0");
+              emptyBoard.push(row);
             }
             //Alocated the ships in the customer board and general board
             let board = locateBoat(emptyBoard, 2);
