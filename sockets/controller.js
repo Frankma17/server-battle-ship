@@ -87,7 +87,6 @@ function locateBoat(board, size) {
         console.log("Entra por primero horizontal");
         if (randomRigth >= 0 && randomRigth <= 29) {
           console.log("Entra por derecha");
-
           if (shipBoard[randomRow][randomColum + size] == 0) {
             rigth = true;
             for (i = randomColum; i < randomColum + size; i++) {
@@ -105,16 +104,15 @@ function locateBoat(board, size) {
           }
         } else if (randomLeft >= 0 && randomLeft <= 29) {
           console.log("Entra por izquierda");
-
           if (shipBoard[randomRow][randomColum - size] == 0) {
             left = true;
-            for (i = randomColum; i < randomColum - size; i--) {
+            for (i = randomColum; i > randomLeft; i--) {
               if (shipBoard[randomRow][i] != 0) {
                 left = false;
               }
             }
             if (left == true) {
-              for (i = randomColum; i < randomColum - size; i--) {
+              for (i = randomColum; i > randomLeft; i--) {
                 shipBoard[randomRow][i] = "H";
                 board[randomRow][i] = "H";
               }
@@ -218,13 +216,13 @@ function locateBoat(board, size) {
 
           if (shipBoard[randomRow][randomColum - size] == 0) {
             left = true;
-            for (i = randomColum; i < randomColum - size; i--) {
+            for (i = randomColum; i >  randomColum - size; i--) {
               if (shipBoard[randomRow][i] != 0) {
                 left = false;
               }
             }
             if (left == true) {
-              for (i = randomColum; i < randomColum - size; i--) {
+              for (i = randomColum; i > randomColum - size; i--) {
                 shipBoard[randomRow][i] = "H";
                 board[randomRow][i] = "H";
               }
@@ -440,9 +438,9 @@ const socketController = (socket, io) => {
             ],
           ];
           let board = locateBoat(emptyBoard, 2);
-          board = locateBoat(board, 3);
-          board = locateBoat(board, 2);
-          board = locateBoat(board, 2);
+          // board = locateBoat(board, 2);
+
+
           console.log(`Tablero del usuario ${customer.name}`);
           printBoard(board);
           const shipCustomer = {
@@ -582,6 +580,10 @@ function attack(x, y, io) {
 function validateLoser(id,io) {
   const index = shipsCustomers.findIndex((customer) => customer.id === id);
   if (index !== -1) {
+    console.log("El tablero a validar es")
+    console.log(shipsCustomers[index].board)
+    console.log("El resultado de la validación es ")
+    console.log(isZeros(shipsCustomers[index].board))
     if (isZeros(shipsCustomers[index].board)) {
       console.log("Entra a loser")
       const specificCustomer = io.sockets.sockets.get(id);
@@ -597,7 +599,7 @@ function validateLoser(id,io) {
 function isZeros(arrayOfArrays) {
   let allZeros = true;
   arrayOfArrays.forEach(function(array) {
-    if (!array.every(element => element === 0)) {
+    if (!array.every(element => element == 0)) {
       allZeros = false;
     }
   });
