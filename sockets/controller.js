@@ -306,8 +306,8 @@ const socketController = (socket, io) => {
         if(customersTurn.length == 0 ){
           customersTurn = [...customers];
         }
-        hostCustomer = customersTurn[0];
-        io.emit("turn-atack", hostCustomer);
+        customerTurn = customersTurn[0];
+        io.emit("turn-atack", customerTurn);
         printBoard(shipBoard);
       });
     
@@ -578,12 +578,6 @@ function attack(x, y, io) {
     customers.forEach((element) => {
       validateLoser(element.id,io);
     });
-    customersTurn.shift();
-    if (customers.length == 0) {
-      customersTurn = [...customers];
-    }
-    customerTurn = customersTurn[0];
-    io.emit("turn-atack", customerTurn);
     if(customers.length == 1){
       io.emit("send-winner", customers[0]);
     }
